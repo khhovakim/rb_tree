@@ -24,7 +24,8 @@ BINDIR = bin
 TARGET = $(BINDIR)/$(NAME)
 
 # ===== Source files =====
-SRCFILES =	$(shell find $(SRCDIR) -name "*.c")\
+SRCFILES = main.cpp\
+			$(shell find $(SRCDIR) -name "*.c")\
 			$(shell find $(SRCDIR) -name "*.cc")\
 			$(shell find $(SRCDIR) -name "*.cpp")
 
@@ -33,7 +34,8 @@ INCDIRS  = $(shell find $(INCDIR) -type d)
 IFLAGS   = $(foreach dir,$(INCDIRS),-I$(dir))
 
 # ===== Object files =====
-OBJFILES =	$(patsubst %.c,$(OBJDIR)/%.o,$(filter %.c,$(SRCFILES)))\
+OBJFILES = \
+			$(patsubst %.c,$(OBJDIR)/%.o,$(filter %.c,$(SRCFILES)))\
 			$(patsubst %.cc,$(OBJDIR)/%.o,$(filter %.cc,$(SRCFILES)))\
 			$(patsubst %.cpp,$(OBJDIR)/%.o,$(filter %.cpp,$(SRCFILES)))
 
