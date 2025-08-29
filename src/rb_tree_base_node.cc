@@ -8,7 +8,7 @@ namespace cxx {
   // Finds the minimum node in the Red-Black Tree rooted at _x.
   // Traverses left children until reaching the leftmost node or the nil sentinel.
   constexpr rb_tree_base_node *
-  rb_tree_base_node::_minimum(_base_ptr _x, const _base_ptr _nil)
+  rb_tree_base_node::_minimum(_base_ptr _x, const _base_ptr _nil) noexcept
   {
     if ( _x == _nil ) {
       return _x;
@@ -24,7 +24,7 @@ namespace cxx {
   // Finds the maximum node in the Red-Black Tree rooted at _x.
   // Traverses right children until reaching the rightmost node or the nil sentinel.
   constexpr rb_tree_base_node *
-  rb_tree_base_node::_maximum(_base_ptr _x, const _base_ptr _nil)
+  rb_tree_base_node::_maximum(_base_ptr _x, const _base_ptr _nil) noexcept
   {
     if ( _x == _nil ) {
       return _x;
@@ -35,27 +35,6 @@ namespace cxx {
     }
 
     return _x;
-  }
-
-}
-
-//! @brief Const overloads for minimum and maximum node search in Red-Black Tree.
-//! These functions provide const-correct access to the minimum and maximum node search
-//! by forwarding to the non-const internal implementations.
-namespace cxx {
-
-  const rb_tree_base_node *
-  rb_tree_base_node::minimum(const _base_ptr _x, const _base_ptr _nil)
-  {
-    // Forward to the non-const implementation after casting away constness.
-    return _minimum(const_cast<_base_ptr>(_x), _nil);
-  }
-
-  const rb_tree_base_node *
-  rb_tree_base_node::_maximum(const _base_ptr _x, const _base_ptr _nil)
-  {
-    // Forward to the non-const implementation after casting away constness.
-    return _maximum(const_cast<_base_ptr>(_x), _nil);
   }
 
 }
@@ -109,27 +88,6 @@ namespace cxx {
     }
 
     return _parent;
-  }
-
-}
-
-//! @brief Const overloads for next and prev node search in Red-Black Tree.
-//! These functions provide const-correct access to the next and previous node search
-//! by forwarding to the non-const internal implementations.
-namespace cxx {
-
-  const rb_tree_base_node *
-  rb_tree_base_node::next(const _base_ptr _x, const _base_ptr _nil) noexcept
-  {
-    // Forward to the non-const implementation after casting away constness.
-    return _next(const_cast<_base_ptr>(_x), _nil);
-  }
-
-  const rb_tree_base_node *
-  rb_tree_base_node::prev(const _base_ptr _x, const _base_ptr _nil) noexcept
-  {
-    // Forward to the non-const implementation after casting away constness.
-    return _prev(const_cast<_base_ptr>(_x), _nil);
   }
 
 }

@@ -36,67 +36,43 @@ namespace cxx {
     *   - _maximum: Returns the maximum node in the subtree rooted at a given node.
     *   - _next: Returns the next node in the in-order traversal.
     *   - _prev: Returns the previous node in the in-order traversal.
-    *   - Const versions of the above functions are also provided.
     *
     * All functions take a sentinel node (_nil) representing the leaf/null node in the Red-Black Tree.
     */
   struct rb_tree_base_node
   {
-    using _color                = rb_tree_node_color ;
+    using _node_color           = rb_tree_node_color ;
     using _base_ptr             = rb_tree_base_node *;
 
-    _base_ptr _parent { nullptr };     ///< Pointer to the parent node.
-    _base_ptr _left   { nullptr };     ///< Pointer to the left child node.
-    _base_ptr _right  { nullptr };     ///< Pointer to the right child node.
-    _color    _color  { _color::Red }; ///< Color of the node (red or black).
+    _base_ptr   _parent { nullptr };     ///< Pointer to the parent node.
+    _base_ptr   _left   { nullptr };     ///< Pointer to the left child node.
+    _base_ptr   _right  { nullptr };     ///< Pointer to the right child node.
+    _node_color _color  { _node_color::Red }; ///< Color of the node (red or black).
 
     /// @brief Minimum node in the subtree.
     /// @param _x Pointer to the node from which to find the minimum.
     /// @param _nil Sentinel node representing leaf/null in the Red-Black Tree.
     /// @return Pointer to the minimum node in the subtree rooted at `_x`.
-    constexpr static _base_ptr _minimum(_base_ptr _x, const _base_ptr _nil) noexcept;
+    static constexpr _base_ptr _minimum(_base_ptr _x, const _base_ptr _nil) noexcept;
 
     /// @brief Maximum node in the subtree.
     /// @param _x Pointer to the node from which to find the maximum.
     /// @param _nil Sentinel node representing leaf/null in the Red-Black Tree.
     /// @return Pointer to the maximum node in the subtree rooted at `_x`.
-    constexpr static _base_ptr _maximum(_base_ptr _x, const _base_ptr _nil) noexcept;
-
-    /// @brief Minimum node in the subtree (const version).
-    /// @param _x Const pointer to the node from which to find the minimum.
-    /// @param _nil Sentinel node representing leaf/null in the Red-Black Tree.
-    /// @return Const pointer to the minimum node in the subtree rooted at `_x`.
-    static const _base_ptr _minimum(const _base_ptr _x, const _base_ptr _nil) noexcept;
-
-    /// @brief Maximum node in the subtree (const version).
-    /// @param _x Const pointer to the node from which to find the maximum.
-    /// @param _nil Sentinel node representing leaf/null in the Red-Black Tree.
-    /// @return Const pointer to the maximum node in the subtree rooted at `_x`.
-    static const _base_ptr _maximum(const _base_ptr _x, const _base_ptr _nil) noexcept;
+    static constexpr _base_ptr _maximum(_base_ptr _x, const _base_ptr _nil) noexcept;
 
     /// @brief Get the next node in the in-order traversal.
     /// @param _x   Pointer to the current node.
     /// @param _nil Sentinel node representing leaf/null in the Red-Black Tree.
     /// @return Pointer to the next node in the in-order traversal.
-    constexpr static _base_ptr _next(_base_ptr _x, const _base_ptr _nil) noexcept;
+    static constexpr _base_ptr _next(_base_ptr _x, const _base_ptr _nil) noexcept;
 
     /// @brief Get the previous node in the in-order traversal.
     /// @param _x Pointer to the current node.
     /// @param _nil Sentinel node representing leaf/null in the Red-Black Tree.
     /// @return Pointer to the previous node in the in-order traversal.
-    constexpr static _base_ptr _prev(_base_ptr _x, const _base_ptr _nil) noexcept;
+    static constexpr _base_ptr _prev(_base_ptr _x, const _base_ptr _nil) noexcept;
 
-    /// @brief Get the next node in the in-order traversal (const version).
-    /// @param _x Const pointer to the current node.
-    /// @param _nil Sentinel node representing leaf/null in the Red-Black Tree.
-    /// @return Const pointer to the next node in the in-order traversal.
-    static const _base_ptr _next(const _base_ptr _x, const _base_ptr _nil) noexcept;
-
-    /// @brief Get the previous node in the in-order traversal (const version).
-    /// @param _x Const pointer to the current node.
-    /// @param _nil Sentinel node representing leaf/null in the Red-Black Tree.
-    /// @return Const pointer to the previous node in the in-order traversal.
-    static const _base_ptr _prev(const _base_ptr _x, const _base_ptr _nil) noexcept;
   };
 }
 
