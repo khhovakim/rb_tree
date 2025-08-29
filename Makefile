@@ -39,11 +39,20 @@ OBJFILES = \
 			$(patsubst %.cc,$(OBJDIR)/%.o,$(filter %.cc,$(SRCFILES)))\
 			$(patsubst %.cpp,$(OBJDIR)/%.o,$(filter %.cpp,$(SRCFILES)))
 
-# ===== Compiler and flags =====
+# ===== Compilers =====
 CC       = clang
 CXX      = clang++
-CCFLAGS  = -std=c11   -Wall -Wextra -Werror -fsanitize=address -DNDEBUG -pedantic-errors
-CXXFLAGS = -std=c++17 -Wall -Wextra -Werror -fsanitize=address -DNDEBUG -pedantic-errors
+
+# ===== Flags =====
+ifeq ($(DEBUG),1)
+  CCFLAGS  = -std=c11   -Wall -Wextra -Werror -g -O0 -pedantic-errors -fsanitize=address
+  CXXFLAGS = -std=c++17 -Wall -Wextra -Werror -g -O0 -pedantic-errors -fsanitize=address
+else
+  CCFLAGS  = -std=c11   -Wall -Wextra -Werror -O2 -DNDEBUG -pedantic-errors
+  CXXFLAGS = -std=c++17 -Wall -Wextra -Werror -O2 -DNDEBUG -pedantic-errors
+endif
+
+DEPFLAGS = -MMD -MP
 
 # ===== Makefile flags =====
 MAKEFLAGS = --no-print-directory
@@ -63,17 +72,17 @@ $(TARGET): $(OBJFILES)
 # ===== Generic object build rule =====
 $(OBJDIR)/%.o: %.c Makefile
 	@mkdir -p $(@D)
-	@$(CC) $(CCFLAGS) -c $< -o $@ $(IFLAGS)
+	@$(CC) $(CCFLAGS) $(DEPFLAGS) $(IFLAGS) -c $< -o $@
 	@echo "$(COMPILING) $(_WHITE) [$(CC)] $< -> $@$(_NC)"
 
 $(OBJDIR)/%.o: %.cc Makefile
 	@mkdir -p $(@D)
-	@$(CXX) $(CXXFLAGS) -c $< -o $@ $(IFLAGS)
+	@$(CXX) $(CXXFLAGS) $(DEPFLAGS) $(IFLAGS) -c $< -o $@
 	@echo "$(COMPILING) $(_WHITE) [$(CXX)] $< -> $@$(_NC)"
 
 $(OBJDIR)/%.o: %.cpp Makefile
 	@mkdir -p $(@D)
-	@$(CXX) $(CXXFLAGS) -c $< -o $@ $(IFLAGS)
+	@$(CXX) $(CXXFLAGS) $(DEPFLAGS) $(IFLAGS) -c $< -o $@
 	@echo "$(COMPILING) $(_WHITE) [$(CXX)] $< -> $@$(_NC)"
 
 # ===== Auto-include dependency files =====
