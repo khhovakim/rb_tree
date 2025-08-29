@@ -14,7 +14,7 @@ namespace cxx {
   template <typename ValueType>
   struct rb_tree_node : public rb_tree_base_node
   {
-    ValueType _value { } ///< Value stored in the node.
+    ValueType _value { }; ///< Value stored in the node.
 
     ///! @brief Constructs a new rb_tree_node with the given value.
     ///! @param value The value to store in the node.
