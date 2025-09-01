@@ -1,8 +1,8 @@
 #include "rb_tree_base_node.h"
 
-//! This namespace encapsulates the fundamental components and algorithms used to manage
-//! Red-Black Tree nodes, including operations for finding minimum and maximum nodes within
-//! the tree structure.
+// This namespace encapsulates the fundamental components and algorithms used to manage
+// Red-Black Tree nodes, including operations for finding minimum and maximum nodes within
+// the tree structure.
 namespace cxx {
 
   // Finds the minimum node in the Red-Black Tree rooted at _x.
@@ -37,11 +37,11 @@ namespace cxx {
     return _x;
   }
 
-}
+} // namespace cxx
 
-//! Implementation of next and prev node search in Red-Black Tree.
-//! These functions find the in-order successor (_next) and predecessor (_prev)
-//! of a given node in the tree, handling the nil sentinel node appropriately.
+// Implementation of next and prev node search in Red-Black Tree.
+// These functions find the in-order successor (_next) and predecessor (_prev)
+// of a given node in the tree, handling the nil sentinel node appropriately.
 namespace cxx {
 
   // Finds the in-order successor of node _x in the Red-Black Tree.
@@ -90,4 +90,4 @@ namespace cxx {
     return _parent;
   }
 
-}
+} // namespace cxx
