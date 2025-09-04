@@ -24,10 +24,7 @@ BINDIR = bin
 TARGET = $(BINDIR)/$(NAME)
 
 # ===== Source files =====
-SRCFILES = main.cpp\
-			$(shell find $(SRCDIR) -name "*.c")\
-			$(shell find $(SRCDIR) -name "*.cc")\
-			$(shell find $(SRCDIR) -name "*.cpp")
+SRCFILES = $(shell find $(SRCDIR) -name "*.c" -o -name "*.cc" -o -name "*.cpp")
 
 # ===== Include directories =====
 INCDIRS  = $(shell find $(INCDIR) -type d)
@@ -35,9 +32,9 @@ IFLAGS   = $(foreach dir,$(INCDIRS),-I$(dir))
 
 # ===== Object files =====
 OBJFILES = \
-			$(patsubst %.c,$(OBJDIR)/%.o,$(filter %.c,$(SRCFILES)))\
-			$(patsubst %.cc,$(OBJDIR)/%.o,$(filter %.cc,$(SRCFILES)))\
-			$(patsubst %.cpp,$(OBJDIR)/%.o,$(filter %.cpp,$(SRCFILES)))
+	$(patsubst %.c,$(OBJDIR)/%.o,$(filter %.c,$(SRCFILES))) \
+	$(patsubst %.cc,$(OBJDIR)/%.o,$(filter %.cc,$(SRCFILES))) \
+	$(patsubst %.cpp,$(OBJDIR)/%.o,$(filter %.cpp,$(SRCFILES)))
 
 # ===== Compilers =====
 CC       = clang
@@ -57,6 +54,11 @@ DEPFLAGS = -MMD -MP
 # ===== Makefile flags =====
 MAKEFLAGS = --no-print-directory
 
+# ===== Usage note =====
+#   make          → Build in release mode
+#   make DEBUG=1  → Build in debug mode
+#   make -j[N]    → Parallel build
+
 # ===== Default target =====
 .PHONY: all
 all: pretty $(TARGET)
@@ -69,42 +71,42 @@ $(TARGET): $(OBJFILES)
 	@$(CXX) $(CXXFLAGS) -o $@ $(OBJFILES)
 	@echo "$(SUCCESS)\n$(_WHITE)Linked $@$(_NC)"
 
-# ===== Generic object build rule =====
+# ===== Generic object build rules =====
 $(OBJDIR)/%.o: %.c Makefile
 	@mkdir -p $(@D)
 	@$(CC) $(CCFLAGS) $(DEPFLAGS) $(IFLAGS) -c $< -o $@
-	@echo "$(COMPILING) $(_WHITE) [$(CC)] $< -> $@$(_NC)"
+	@echo "$(COMPILING) $(_WHITE)[CC] $< → $@$(_NC)"
 
 $(OBJDIR)/%.o: %.cc Makefile
 	@mkdir -p $(@D)
 	@$(CXX) $(CXXFLAGS) $(DEPFLAGS) $(IFLAGS) -c $< -o $@
-	@echo "$(COMPILING) $(_WHITE) [$(CXX)] $< -> $@$(_NC)"
+	@echo "$(COMPILING) $(_WHITE)[CXX] $< → $@$(_NC)"
 
 $(OBJDIR)/%.o: %.cpp Makefile
 	@mkdir -p $(@D)
 	@$(CXX) $(CXXFLAGS) $(DEPFLAGS) $(IFLAGS) -c $< -o $@
-	@echo "$(COMPILING) $(_WHITE) [$(CXX)] $< -> $@$(_NC)"
+	@echo "$(COMPILING) $(_WHITE)[CXX] $< → $@$(_NC)"
 
 # ===== Auto-include dependency files =====
 -include $(OBJFILES:.o=.d)
 
 # ===== Run Program =====
 .PHONY: run
-run:
-	@$(TARGET)
+run: $(TARGET)
+	@./$(TARGET)
 
 # ===== Clean object files only =====
 .PHONY: clean
 clean:
 	@rm -rf $(OBJDIR)
-	@echo "$(_YELLOW)[✗] Removed object files$(_NC)"
+	@echo "$(_YELLOW)[-] Removed object files$(_NC)"
 
 # ===== Clean everything =====
 .PHONY: fclean
 fclean: clean
 	@rm -f  $(TARGET)
 	@rm -rf $(BINDIR)
-	@echo "$(_YELLOW)[✗] Removed Executable $(TARGET)$(_NC)"
+	@echo "$(_RED)[x] Removed Executable $(TARGET)$(_NC)"
 
 # ===== Rebuild everything =====
 .PHONY: re
@@ -117,7 +119,7 @@ pretty:
 	@echo "$(_CYAN) Building $(NAME) Project$(_NC)"
 	@echo "$(_CYAN)=============================$(_NC)"
 
-# Show macro details
+# ===== Show macro details =====
 .PHONY: show
 show:
 	@echo "$(_BLUE)SRCFILES:\t$(_YELLOW)$(SRCFILES)$(_NC)"
@@ -126,3 +128,8 @@ show:
 	@echo "$(_BLUE)CXXFLAGS:\t$(_YELLOW)$(CXXFLAGS)$(_NC)"
 	@echo "$(_BLUE)CCFLAGS:\t$(_YELLOW)$(CCFLAGS)$(_NC)"
 	@echo "$(_BLUE)IFLAGS:\t\t$(_YELLOW)$(IFLAGS)$(_NC)"
+
+# ===== Valgrind (optional, debug only) =====
+.PHONY: valgrind
+valgrind: $(TARGET)
+	valgrind --leak-check=full --show-leak-kinds=all ./$(TARGET)
