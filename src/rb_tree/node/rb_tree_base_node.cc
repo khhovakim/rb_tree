@@ -8,7 +8,7 @@ namespace cxx {
   // Finds the minimum node in the Red-Black Tree rooted at _x.
   // Traverses left children until reaching the leftmost node or the nil sentinel.
   constexpr rb_tree_base_node *
-  rb_tree_base_node::_minimum(_base_ptr _x, const _base_ptr _nil) noexcept
+  rb_tree_base_node::_minimum(base_ptr _x, const base_ptr _nil) noexcept
   {
     if ( _x == _nil ) {
       return _x;
@@ -24,7 +24,7 @@ namespace cxx {
   // Finds the maximum node in the Red-Black Tree rooted at _x.
   // Traverses right children until reaching the rightmost node or the nil sentinel.
   constexpr rb_tree_base_node *
-  rb_tree_base_node::_maximum(_base_ptr _x, const _base_ptr _nil) noexcept
+  rb_tree_base_node::_maximum(base_ptr _x, const base_ptr _nil) noexcept
   {
     if ( _x == _nil ) {
       return _x;
@@ -48,7 +48,7 @@ namespace cxx {
   // If _x has a right child, the successor is the minimum node in the right subtree.
   // Otherwise, traverse up the tree until finding a node that is a left child of its parent.
   constexpr rb_tree_base_node *
-  rb_tree_base_node::_next(_base_ptr _x, const _base_ptr _nil) noexcept
+  rb_tree_base_node::_next(base_ptr _x, const base_ptr _nil) noexcept
   {
     if ( _x == _nil ) {
       return _x;
@@ -58,7 +58,7 @@ namespace cxx {
       return _minimum(_x->_right, _nil);
     }
 
-    _base_ptr _parent = _x->_parent;
+    base_ptr _parent = _x->_parent;
     while ( _parent != _nil && _x == _parent->_right ) {
       _x = _parent;
       _parent = _parent->_parent;
@@ -71,7 +71,7 @@ namespace cxx {
   // If _x has a left child, the predecessor is the maximum node in the left subtree.
   // Otherwise, traverse up the tree until finding a node that is a right child of its parent.
   constexpr rb_tree_base_node *
-  rb_tree_base_node::_prev(_base_ptr _x, const _base_ptr _nil) noexcept
+  rb_tree_base_node::_prev(base_ptr _x, const base_ptr _nil) noexcept
   {
     if ( _x == _nil ) {
       return _x;
@@ -81,7 +81,7 @@ namespace cxx {
       return _maximum(_x->_left, _nil);
     }
 
-    _base_ptr _parent = _x->_parent;
+    base_ptr _parent = _x->_parent;
     while ( _parent != _nil && _x == _parent->_left ) {
       _x = _parent;
       _parent = _parent->_parent;

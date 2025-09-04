@@ -4,7 +4,7 @@
 # include <bits/c++config.h>                // For std::ptrdiff_t
 # include <bits/stl_iterator_base_types.h>  // For std::bidirectional_iterator_tag
 
-# include "rb_tree_node.h"       // For cxx::rb_tree_node
+# include "rb_tree_node.h"  // For cxx::rb_tree_node
 
 namespace cxx {
   /// @brief Iterator for red-black trees.
@@ -15,9 +15,10 @@ namespace cxx {
   struct rb_tree_iterator
   {
   private:
-    using _base_type = rb_tree_node<T>::_base_type;
-    using _base_ptr  = rb_tree_node<T>::_base_ptr;
-    using _node_ptr  = rb_tree_node<T> *;
+    using node     = rb_tree_node<T>;
+    using base     = typename node::base;
+    using base_ptr = base*;
+    using node_ptr = node*;
 
   public:
     using value_type = T;
@@ -31,7 +32,7 @@ namespace cxx {
     /// Initializes the iterator with the given node and nil pointers.
     /// @param node Pointer to the node.
     /// @param nil  Pointer to the nil node.
-    explicit rb_tree_iterator(_node_ptr node, const _base_ptr nil)
+    explicit rb_tree_iterator(node_ptr node, const base_ptr nil)
       : _node { node }, _nil { nil }
     { }
 
@@ -59,7 +60,7 @@ namespace cxx {
     /// Moves the iterator to the next node in the tree.
     /// @return Reference to the updated iterator.
     rb_tree_iterator& operator++() {
-      _node = static_cast<_node_ptr>(_base_type::_next(_node, _nil));
+      _node = static_cast<node_ptr>(base::_next(_node, _nil));
       return *this;
     }
 
@@ -76,7 +77,7 @@ namespace cxx {
     /// Moves the iterator to the previous node in the tree.
     /// @return Reference to the updated iterator.
     rb_tree_iterator& operator--() {
-      _node = static_cast<_node_ptr>(_base_type::_prev(_node, _nil));
+      _node = static_cast<node_ptr>(base::_prev(_node, _nil));
       return *this;
     }
 
@@ -101,8 +102,8 @@ namespace cxx {
       return _node != other._node;
     }
 
-    _node_ptr _node;      ///< Pointer to the current node in the tree.
-    const _base_ptr _nil; ///< Pointer to the nil node in the tree.
+    node_ptr _node;      ///< Pointer to the current node in the tree.
+    const base_ptr _nil; ///< Pointer to the nil node in the tree.
   };
 
 } // namespace cxx
@@ -116,10 +117,11 @@ namespace cxx {
   struct rb_tree_const_iterator
   {
   private:
-    using _base_type = rb_tree_node<T>::_base_type;
-    using _base_ptr  = const rb_tree_node<T>::_base_ptr;
-    using _node_ptr  = const rb_tree_node<T> *;
-    using _iterator  = rb_tree_iterator<T>;
+    using node      = rb_tree_node<T>;
+    using base      = typename node::base;
+    using base_ptr  = const base*;
+    using node_ptr  = const node*;
+    using iterator  = rb_tree_iterator<T>;
 
   public:
     using value_type = T;
@@ -133,14 +135,14 @@ namespace cxx {
     /// Initializes the const iterator with the given base pointer.
     /// @param node Pointer to the base node.
     /// @param nil  Pointer to the nil  node.
-    explicit rb_tree_const_iterator(_node_ptr node, _base_ptr nil)
+    explicit rb_tree_const_iterator(node_ptr node, base_ptr nil)
       : _node { node }, _nil { nil }
     { }
 
     /// @brief Constructor from a non-const iterator.
     /// Initializes the const iterator with a non-const iterator.
     /// @param it The non-const iterator to copy from.
-    explicit rb_tree_const_iterator(const _iterator& it)
+    explicit rb_tree_const_iterator(const iterator& it)
       : _node { it._node }, _nil { it._nil }
     { }
 
@@ -169,7 +171,7 @@ namespace cxx {
     /// Moves the iterator to the next node in the tree.
     /// @return Reference to the updated iterator.
     rb_tree_const_iterator& operator++() noexcept {
-      _node = static_cast<_node_ptr>(_base_type::_next(_node, _nil));
+      _node = static_cast<node_ptr>(base::_next(_node, _nil));
       return *this;
     }
 
@@ -186,7 +188,7 @@ namespace cxx {
     /// Moves the iterator to the previous node in the tree.
     /// @return Reference to the updated iterator.
     rb_tree_const_iterator& operator--() noexcept {
-      _node = static_cast<_node_ptr>(_base_type::_prev(_node, _nil));
+      _node = static_cast<node_ptr>(base::_prev(_node, _nil));
       return *this;
     }
 
@@ -215,8 +217,8 @@ namespace cxx {
       return _node == other._node;
     }
 
-    _node_ptr _node; ///< Pointer to the current node in the tree.
-    _base_ptr _nil;  ///< Pointer to the nil node in the tree.
+    node_ptr _node; ///< Pointer to the current node in the tree.
+    base_ptr _nil;  ///< Pointer to the nil node in the tree.
   };
 } // namespace cxx
 

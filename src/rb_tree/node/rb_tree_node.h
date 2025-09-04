@@ -14,8 +14,8 @@ namespace cxx {
   template <typename ValueType>
   struct rb_tree_node : public rb_tree_base_node
   {
-    using _base_type = rb_tree_base_node;
-    using _base_ptr  = rb_tree_base_node *;
+    using base      = rb_tree_base_node;
+    using base_ptr  = rb_tree_base_node *;
 
     ValueType _value; ///< Value stored in the node.
 
