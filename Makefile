@@ -1,4 +1,8 @@
-# ===== Colors for pretty output =====
+# ===========================
+# Makefile for rb_tree project
+# ===========================
+
+# ===== Colors =====
 _GREY   = \033[1;30m
 _RED    = \033[1;31m
 _GREEN  = \033[1;32m
@@ -9,80 +13,58 @@ _CYAN   = \033[1;36m
 _WHITE  = \033[1;37m
 _NC     = \033[0m
 
-# Colored messages
 SUCCESS   = $(_GREEN)SUCCESS[✔]$(_NC)
 COMPILING = $(_BLUE)COMPILING[●]$(_NC)
 
-# ===== Executable name =====
+# ===== Project =====
 NAME = rb_tree
-
-# ===== Directories =====
 SRCDIR = src
 INCDIR = include
 
-OBJDIR_RELEASE = obj/release
-OBJDIR_DEBUG   = obj/debug
-OBJDIR_ASAN    = obj/asan
+# ===== Directories =====
+OBJDIR = obj
+BINDIR = bin
 
-BINDIR_RELEASE = bin/release
-BINDIR_DEBUG   = bin/debug
-BINDIR_ASAN    = bin/asan
-
-TARGET_RELEASE = $(BINDIR_RELEASE)/$(NAME)
-TARGET_DEBUG   = $(BINDIR_DEBUG)/$(NAME)
-TARGET_ASAN    = $(BINDIR_ASAN)/$(NAME)
-
-# ===== Source files =====
-SRCFILES = $(shell find $(SRCDIR) -name "*.c" -o -name "*.cc" -o -name "*.cpp")
-
-# ===== Include directories =====
-INCDIRS  = $(shell find $(INCDIR) -type d)
-IFLAGS   = $(foreach dir,$(INCDIRS),-I$(dir))
-
-# ===== Compilers =====
-CC       = clang
-CXX      = clang++
+# ===== Compiler =====
+CC = clang
+CXX = clang++
 
 # ===== Flags =====
 FLAGS = -Wall -Wextra -Werror -pedantic-errors
 
-CCFLAGS   = -std=c11 $(FLAGS)
+CCFLAGS   = -std=c11   $(FLAGS)
 CCXXFLAGS = -std=c++17 $(FLAGS)
 
-CFLAGS_RELEASE   = $(CCFLAGS) -O2 -DNDEBUG
+CFLAGS_RELEASE   = $(CCFLAGS)   -O2 -DNDEBUG
 CXXFLAGS_RELEASE = $(CCXXFLAGS) -O2 -DNDEBUG
 
-CFLAGS_DEBUG     = $(CCFLAGS) -g -O0
+CFLAGS_DEBUG     = $(CCFLAGS)   -g -O0
 CXXFLAGS_DEBUG   = $(CCXXFLAGS) -g -O0
 
-CFLAGS_ASAN      = $(CCFLAGS) -g -O0 -fsanitize=address -fno-omit-frame-pointer
+CFLAGS_ASAN      = $(CCFLAGS)   -g -O0 -fsanitize=address -fno-omit-frame-pointer
 CXXFLAGS_ASAN    = $(CCXXFLAGS) -g -O0 -fsanitize=address -fno-omit-frame-pointer
 
 DEPFLAGS = -MMD -MP
 
-# ===== Object lists =====
-OBJ_RELEASE = \
-	$(patsubst %.c,$(OBJDIR_RELEASE)/%.o,$(filter %.c,$(SRCFILES))) \
-	$(patsubst %.cc,$(OBJDIR_RELEASE)/%.o,$(filter %.cc,$(SRCFILES))) \
-	$(patsubst %.cpp,$(OBJDIR_RELEASE)/%.o,$(filter %.cpp,$(SRCFILES)))
+# ===== Source files =====
+SRCFILES = $(shell find $(SRCDIR) -type f \( -name "*.c" -o -name "*.cc" -o -name "*.cpp" \))
+INCDIRS  = $(shell find $(INCDIR) -type d)
+IFLAGS   = $(foreach dir,$(INCDIRS),-I$(dir))
 
-OBJ_DEBUG = \
-	$(patsubst %.c,$(OBJDIR_DEBUG)/%.o,$(filter %.c,$(SRCFILES))) \
-	$(patsubst %.cc,$(OBJDIR_DEBUG)/%.o,$(filter %.cc,$(SRCFILES))) \
-	$(patsubst %.cpp,$(OBJDIR_DEBUG)/%.o,$(filter %.cpp,$(SRCFILES)))
+# ===== Object files =====
+define MAKE_OBJ_LIST
+$(patsubst %.c,$(OBJDIR)/$1/%.o,$(filter %.c,$(SRCFILES))) \
+$(patsubst %.cc,$(OBJDIR)/$1/%.o,$(filter %.cc,$(SRCFILES))) \
+$(patsubst %.cpp,$(OBJDIR)/$1/%.o,$(filter %.cpp,$(SRCFILES)))
+endef
 
-OBJ_ASAN = \
-	$(patsubst %.c,$(OBJDIR_ASAN)/%.o,$(filter %.c,$(SRCFILES))) \
-	$(patsubst %.cc,$(OBJDIR_ASAN)/%.o,$(filter %.cc,$(SRCFILES))) \
-	$(patsubst %.cpp,$(OBJDIR_ASAN)/%.o,$(filter %.cpp,$(SRCFILES)))
+OBJ_RELEASE = $(call MAKE_OBJ_LIST,release)
+OBJ_DEBUG   = $(call MAKE_OBJ_LIST,debug)
+OBJ_ASAN    = $(call MAKE_OBJ_LIST,asan)
 
-# ===== Makefile flags =====
-MAKEFLAGS = --no-print-directory
-
-# ===== Usage note =====
-#   make release → Optimized build
-#   make debug   → Debug build
-#   make asan    → ASan build
+TARGET_RELEASE = $(BINDIR)/release/$(NAME)
+TARGET_DEBUG   = $(BINDIR)/debug/$(NAME)
+TARGET_ASAN    = $(BINDIR)/asan/$(NAME)
 
 # ===== Default target =====
 .PHONY: all
@@ -90,89 +72,53 @@ all: release
 
 # ===== Build modes =====
 .PHONY: release debug asan
-
-release: pretty
-release: CFLAGS = $(CFLAGS_RELEASE)
-release: CXXFLAGS = $(CXXFLAGS_RELEASE)
+release: CFLAGS=$(CFLAGS_RELEASE)
+release: CXXFLAGS=$(CXXFLAGS_RELEASE)
 release: $(TARGET_RELEASE)
 
-debug:   pretty
-debug:   CFLAGS = $(CFLAGS_DEBUG)
-debug:   CXXFLAGS = $(CXXFLAGS_DEBUG)
-debug:   $(TARGET_DEBUG)
+debug: CFLAGS=$(CFLAGS_DEBUG)
+debug: CXXFLAGS=$(CXXFLAGS_DEBUG)
+debug: $(TARGET_DEBUG)
 
-asan:    pretty
-asan:    CFLAGS = $(CFLAGS_ASAN)
-asan:    CXXFLAGS = $(CXXFLAGS_ASAN)
-asan:    $(TARGET_ASAN)
+asan: CFLAGS=$(CFLAGS_ASAN)
+asan: CXXFLAGS=$(CXXFLAGS_ASAN)
+asan: $(TARGET_ASAN)
 
 # ===== Linking =====
-$(TARGET_RELEASE): $(OBJ_RELEASE)
+define LINK_RULE
+$1: $2
 	@echo
-	@echo "$(_CYAN)Creating Executable $(_WHITE)$@ ...$(_NC)"
-	@mkdir -p $(BINDIR_RELEASE)
-	@$(CXX) $(CXXFLAGS) -o $@ $(OBJ_RELEASE)
-	@echo "$(SUCCESS)\n$(_WHITE)Linked $@$(_NC)"
+	@echo "$(_CYAN)Creating Executable $(_WHITE)$(_NC)"
+	@mkdir -p $$(@D)
+	@$(CXX) $(CXXFLAGS) -o $$@ $2
+	@echo "$(SUCCESS)\n$(_WHITE)Linked $$@"
+endef
 
-$(TARGET_DEBUG): $(OBJ_DEBUG)
-	@echo
-	@echo "$(_CYAN)Creating Executable $(_WHITE)$@ ...$(_NC)"
-	@mkdir -p $(BINDIR_DEBUG)
-	@$(CXX) $(CXXFLAGS) -o $@ $(OBJ_DEBUG)
-	@echo "$(SUCCESS)\n$(_WHITE)Linked $@$(_NC)"
-
-$(TARGET_ASAN): $(OBJ_ASAN)
-	@echo
-	@echo "$(_CYAN)Creating Executable $(_WHITE)$@ ...$(_NC)"
-	@mkdir -p $(BINDIR_ASAN)
-	@$(CXX) $(CXXFLAGS) -o $@ $(OBJ_ASAN)
-	@echo "$(SUCCESS)\n$(_WHITE)Linked $@$(_NC)"
+$(eval $(call LINK_RULE,$(TARGET_RELEASE),$(OBJ_RELEASE)))
+$(eval $(call LINK_RULE,$(TARGET_DEBUG),$(OBJ_DEBUG)))
+$(eval $(call LINK_RULE,$(TARGET_ASAN),$(OBJ_ASAN)))
 
 # ===== Compile rules =====
-$(OBJDIR_RELEASE)/%.o: %.c Makefile
-	@mkdir -p $(@D)
-	@echo "$(COMPILING) $(_WHITE)[CC][RELEASE] $< → $@$(_NC)"
-	$(CC) $(CFLAGS) $(DEPFLAGS) $(IFLAGS) -c $< -o $@
+define COMPILE_RULE
+$(OBJDIR)/$1/%.o: %.c Makefile
+	@mkdir -p $$(@D)
+	@echo "$(COMPILING) $(_WHITE)[CC][$1] $$< → $$@$(_NC)"
+	@$(CC) $$(CFLAGS) $(DEPFLAGS) $(IFLAGS) -c $$< -o $$@
 
-$(OBJDIR_RELEASE)/%.o: %.cc Makefile
-	@mkdir -p $(@D)
-	@echo "$(COMPILING) $(_WHITE)[CXX][RELEASE] $< → $@$(_NC)"
-	$(CXX) $(CXXFLAGS) $(DEPFLAGS) $(IFLAGS) -c $< -o $@
+$(OBJDIR)/$1/%.o: %.cc Makefile
+	@mkdir -p $$(@D)
+	@echo "$(COMPILING) $(_WHITE)[CXX][$1] $$< → $$@$(_NC)"
+	@$(CXX) $$(CXXFLAGS) $(DEPFLAGS) $(IFLAGS) -c $$< -o $$@
 
-$(OBJDIR_RELEASE)/%.o: %.cpp Makefile
-	@mkdir -p $(@D)
-	@echo "$(COMPILING) $(_WHITE)[CXX][RELEASE] $< → $@$(_NC)"
-	$(CXX) $(CXXFLAGS) $(DEPFLAGS) $(IFLAGS) -c $< -o $@
+$(OBJDIR)/$1/%.o: %.cpp Makefile
+	@mkdir -p $$(@D)
+	@echo "$(COMPILING) $(_WHITE)[CXX][$1] $$< → $$@$(_NC)"
+	@$(CXX) $$(CXXFLAGS) $(DEPFLAGS) $(IFLAGS) -c $$< -o $$@
+endef
 
-$(OBJDIR_DEBUG)/%.o: %.c Makefile
-	@mkdir -p $(@D)
-	@echo "$(COMPILING) $(_WHITE)[CC][DEBUG] $< → $@$(_NC)"
-	$(CC) $(CFLAGS) $(DEPFLAGS) $(IFLAGS) -c $< -o $@
-
-$(OBJDIR_DEBUG)/%.o: %.cc Makefile
-	@mkdir -p $(@D)
-	@echo "$(COMPILING) $(_WHITE)[CXX][DEBUG] $< → $@$(_NC)"
-	$(CXX) $(CXXFLAGS) $(DEPFLAGS) $(IFLAGS) -c $< -o $@
-
-$(OBJDIR_DEBUG)/%.o: %.cpp Makefile
-	@mkdir -p $(@D)
-	@echo "$(COMPILING) $(_WHITE)[CXX][DEBUG] $< → $@$(_NC)"
-	$(CXX) $(CXXFLAGS) $(DEPFLAGS) $(IFLAGS) -c $< -o $@
-
-$(OBJDIR_ASAN)/%.o: %.c Makefile
-	@mkdir -p $(@D)
-	@echo "$(COMPILING) $(_WHITE)[CC][ASAN] $< → $@$(_NC)"
-	$(CC) $(CFLAGS) $(DEPFLAGS) $(IFLAGS) -c $< -o $@
-
-$(OBJDIR_ASAN)/%.o: %.cc Makefile
-	@mkdir -p $(@D)
-	@echo "$(COMPILING) $(_WHITE)[CXX][ASAN] $< → $@$(_NC)"
-	$(CXX) $(CXXFLAGS) $(DEPFLAGS) $(IFLAGS) -c $< -o $@
-
-$(OBJDIR_ASAN)/%.o: %.cpp Makefile
-	@mkdir -p $(@D)
-	@echo "$(COMPILING) $(_WHITE)[CXX][ASAN] $< → $@$(_NC)"
-	$(CXX) $(CXXFLAGS) $(DEPFLAGS) $(IFLAGS) -c $< -o $@
+$(eval $(call COMPILE_RULE,release))
+$(eval $(call COMPILE_RULE,debug))
+$(eval $(call COMPILE_RULE,asan))
 
 # ===== Auto-include dependency files =====
 -include $(OBJ_RELEASE:.o=.d)
@@ -185,21 +131,89 @@ run: release
 	@echo "$(_WHITE)Running $(TARGET_RELEASE)...$(_NC)"
 	@./$(TARGET_RELEASE)
 
-# ===== Clean =====
+# ===== Cleaning =====
 .PHONY: clean fclean re
 clean:
-	@rm -rf obj
+	@rm -rf $(OBJDIR)
 	@echo "$(_YELLOW)[-] Removed object files$(_NC)"
 
 fclean: clean
-	@rm -rf bin
-	@echo "$(_RED)[x] Removed all executables$(_NC)"
+	@rm -rf $(BINDIR)
+	@echo "$(_RED)[x] Removed executables$(_NC)"
 
 re: fclean all
 	@echo "$(_GREEN)[✔] Rebuild complete$(_NC)"
 
-# ===== Phony target to prevent conflicts with files named 'Makefile' =====
-.PHONY: Makefile
+# ===== Show info =====
+
+# PRINT: print a header (MSG1) in blue, then print each token of MSG2 on its own grey line prefixed with " -> "
+# Args: $1 = header/title, $2 = space-separated list (or string) to print line-by-line
+define PRINT
+	MSG1=$$(echo "$1" | sed ':a;N;s/^\n*//;s/\n*$$//;ta'); \
+	MSG2=$$(echo "$2" | sed ':a;N;s/^\n*//;s/\n*$$//;ta'); \
+	printf "$(_BLUE)%s\n" "$$MSG1"; \
+	echo "$$MSG2" | tr ' ' '\n' | while IFS= read -r line; do \
+		[ -n "$$line" ] && printf "$(_GREY) -> $(_NC)%s\n" "$$line"; \
+	done; \
+	echo
+endef
+
+.PHONY: show
+.PHONY: show_sources
+.PHONY: show_release_objects
+.PHONY: show_debug_objects
+.PHONY: show_asan_objects
+.PHONY: show_compilers
+.PHONY: show_release_flags
+.PHONY: show_debug_flags
+.PHONY: show_asan_flags
+.PHONY: show_includes
+.PHONY: show_include_flags
+
+show: show_src
+show: show_release_obj
+show: show_debug_obj
+show: show_asan_obj
+show: show_compilers
+show: show_release_flags
+show: show_debug_flags
+show: show_asan_flags
+show: show_includes
+show: show_include_flags
+
+show_src:
+	@$(call PRINT,"Source Files:","$(SRCFILES)")
+
+show_release_obj:
+	@$(call PRINT,"Release Objects:","$(OBJ_RELEASE)")
+
+show_debug_obj:
+	@$(call PRINT,"Debug Objects:","$(OBJ_DEBUG)")
+
+show_asan_obj:
+	@$(call PRINT,"ASan Objects:","$(OBJ_ASAN)")
+
+show_compilers:
+	@$(call PRINT,"C Compilers:","$(CC)")
+	@$(call PRINT,"C++ Compilers:","$(CXX)")
+
+show_release_flags:
+	@$(call PRINT,"Release CFlags:","$(CFLAGS_RELEASE)")
+	@$(call PRINT,"Release CXXFlags:","$(CXXFLAGS_RELEASE)")
+
+show_debug_flags:
+	@$(call PRINT,"Debug CFlags:","$(CFLAGS_DEBUG)")
+	@$(call PRINT,"Debug CXXFlags:","$(CXXFLAGS_DEBUG)")
+
+show_asan_flags:
+	@$(call PRINT,"ASan CFlags:","$(CFLAGS_ASAN)")
+	@$(call PRINT,"ASan CXXFlags:","$(CXXFLAGS_ASAN)")
+
+show_includes:
+	@$(call PRINT,"Include Directories:","$(INCDIRS)")
+
+show_include_flags:
+	@$(call PRINT,"Include Flags:","$(IFLAGS)")
 
 # ===== Beautify output =====
 .PHONY: pretty
@@ -208,26 +222,8 @@ pretty:
 	@echo "$(_CYAN) Building $(NAME) Project$(_NC)"
 	@echo "$(_CYAN)=============================$(_NC)"
 
-# ===== Show macro details =====
-.PHONY: show
-show:
-	@printf "$(_BLUE)%s\n$(_WHITE)%s$(_NC)\n" "SRCFILES:"    "$(SRCFILES)"
-	@printf "$(_BLUE)%s\n$(_WHITE)%s$(_NC)\n" "OBJ_RELEASE:" "$(OBJ_RELEASE)"
-	@printf "$(_BLUE)%s\n$(_WHITE)%s$(_NC)\n" "OBJ_DEBUG:"   "$(OBJ_DEBUG)"
-	@printf "$(_BLUE)%s\n$(_WHITE)%s$(_NC)\n" "OBJ_ASAN:"    "$(OBJ_ASAN)"
-	@printf "\n"
-	@printf "$(_BLUE)%-20s $(_WHITE)%s$(_NC)\n" "C Compiler:"       "$(CC)"
-	@printf "$(_BLUE)%-20s $(_WHITE)%s$(_NC)\n" "CPP Compiler:"     "$(CXX)"
-	@printf "$(_BLUE)%-20s $(_WHITE)%s$(_NC)\n" "CFLAGS_RELEASE:"   "$(CFLAGS_RELEASE)"
-	@printf "$(_BLUE)%-20s $(_WHITE)%s$(_NC)\n" "CXXFLAGS_RELEASE:" "$(CXXFLAGS_RELEASE)"
-	@printf "$(_BLUE)%-20s $(_WHITE)%s$(_NC)\n" "CFLAGS_DEBUG:"     "$(CFLAGS_DEBUG)"
-	@printf "$(_BLUE)%-20s $(_WHITE)%s$(_NC)\n" "CXXFLAGS_DEBUG:"   "$(CXXFLAGS_DEBUG)"
-	@printf "$(_BLUE)%-20s $(_WHITE)%s$(_NC)\n" "CFLAGS_ASAN:"      "$(CFLAGS_ASAN)"
-	@printf "$(_BLUE)%-20s $(_WHITE)%s$(_NC)\n" "CXXFLAGS_ASAN:"    "$(CXXFLAGS_ASAN)"
-	@printf "$(_BLUE)%-20s $(_WHITE)%s$(_NC)\n" "IFLAGS:"           "$(IFLAGS)"
-
-# ===== Valgrind (optional, debug only) =====
+# ===== Valgrind =====
 .PHONY: valgrind
 valgrind: debug
-	@echo "$(_YELLOW)Running Valgrind on debug build...$(_NC)"
+	@echo "$(_YELLOW)Running Valgrind...$(_NC)"
 	valgrind --leak-check=full --show-leak-kinds=all ./$(TARGET_DEBUG)
