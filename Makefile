@@ -181,7 +181,8 @@ $(OBJDIR_ASAN)/%.o: %.cpp Makefile
 
 # ===== Run Program =====
 .PHONY: run
-run: $(TARGET_RELEASE)
+run: release
+	@echo "$(_WHITE)Running $(TARGET_RELEASE)...$(_NC)"
 	@./$(TARGET_RELEASE)
 
 # ===== Clean =====
